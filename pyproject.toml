@@ -1,0 +1,51 @@
+[project]
+name = "ugc-surveys"
+version = "0.1.0"
+description = "User-generated content survey platform"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.2.7",
+    "django-environ>=0.12.0",
+    "djangorestframework>=3.16.1",
+    "djangorestframework-simplejwt>=5.5.1",
+    "drf-spectacular>=0.28.0",
+    "psycopg[binary]>=3.2.11",
+]
+
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D",      # Разрешить не писать docstrings
+    "RUF001", # Разрешить использовать кириллицу в коде
+    "RUF002", # Разрешить использовать кириллицу в docstrings
+    "RUF003", # Разрешить использовать кириллицу в комментариях
+
+
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/migrations/*.py" = ["ALL"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "config.settings.base"
+
+[dependency-groups]
+dev = [
+    "django-stubs>=5.2.7",
+    "djangorestframework-stubs>=3.16.5",
+    "mypy>=1.18.2",
+    "ruff>=0.14.1",
+]

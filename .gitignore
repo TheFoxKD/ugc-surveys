@@ -1,0 +1,30 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Environment
+.env
+.venv/
+.python-version
+
+# Django
+media/
+staticfiles/
+*.sqlite3
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+
+# uv build outputs
+.uv/
+build/
+dist/
+
+# Coverage / tests
+.coverage
+coverage.xml
+htmlcov/
