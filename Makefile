@@ -1,4 +1,4 @@
-.PHONY: up down migrate makemigrations shell lint typecheck test local build restart reset show_urls
+.PHONY: up down migrate makemigrations shell lint typecheck test local build restart reset show_urls seed_demo
 
 
 build:
@@ -36,3 +36,6 @@ format:
 
 typecheck:
 	PYTHONPATH=src DJANGO_SETTINGS_MODULE=config.settings.dev uv run mypy src
+
+seed_demo:
+	docker compose exec web uv run python -m src.manage seed_demo
