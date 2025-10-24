@@ -5,7 +5,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from src.surveys.models import AnswerOption, Question, Survey
-from src.surveys.serializers import AnswerSubmitSerializer, NextQuestionSerializer
+from src.surveys.serializers import (
+    AnswerResultSerializer,
+    AnswerSubmitSerializer,
+    NextQuestionSerializer,
+)
 from src.surveys.services import SurveyRunService
 
 
@@ -37,7 +41,8 @@ class NextQuestionView(generics.GenericAPIView):
     def get(self, request: Request, pk: int) -> Response:
         survey = get_object_or_404(Survey, pk=pk)
         run = SurveyRunService.get_or_create_active_run(
-            survey=survey, user=request.user,
+            survey=survey,
+            user=request.user,
         )
         question = SurveyRunService.next_question(run)
         if question is None:
@@ -54,12 +59,34 @@ class AnswerSubmitView(generics.GenericAPIView):
     @extend_schema(
         summary="Отправить ответ",
         request=AnswerSubmitSerializer,
-        responses={status.HTTP_200_OK: None},
+        responses={status.HTTP_200_OK: AnswerResultSerializer},
         examples=[
             OpenApiExample(
                 "Submit answer",
                 value={"question_id": 42, "option_id": 101},
                 request_only=True,
+            ),
+            OpenApiExample(
+                "Next question available",
+                value={
+                    "run_id": 5,
+                    "completed": False,
+                    "question": {
+                        "id": 43,
+                        "text": "Следующий вопрос?",
+                        "position": 2,
+                        "answer_options": [
+                            {"id": 111, "text": "Да", "position": 1},
+                            {"id": 112, "text": "Нет", "position": 2},
+                        ],
+                    },
+                },
+                response_only=True,
+            ),
+            OpenApiExample(
+                "Survey completed",
+                value={"run_id": 5, "completed": True, "question": None},
+                response_only=True,
             ),
         ],
     )
@@ -69,7 +96,8 @@ class AnswerSubmitView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         run = SurveyRunService.get_or_create_active_run(
-            survey=survey, user=request.user,
+            survey=survey,
+            user=request.user,
         )
         question = get_object_or_404(
             Question,
@@ -84,7 +112,11 @@ class AnswerSubmitView(generics.GenericAPIView):
 
         SurveyRunService.create_answer(run=run, question=question, option=option)
 
-        if SurveyRunService.is_completed(run):
+        next_q = SurveyRunService.next_question(run)
+        completed = next_q is None
+        if completed:
             run.mark_finished()
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        payload = {"run_id": run.pk, "completed": completed, "question": next_q}
+        data = AnswerResultSerializer(payload).data
+        return Response(data, status=status.HTTP_200_OK)

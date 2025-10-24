@@ -25,3 +25,16 @@ class NextQuestionSerializer(serializers.Serializer):
 class AnswerSubmitSerializer(serializers.Serializer):
     question_id = serializers.IntegerField()
     option_id = serializers.IntegerField()
+
+
+class AnswerResultSerializer(serializers.Serializer):
+    """Ответ после отправки ответа пользователем.
+
+    Возвращает идентификатор прогона, флаг завершённости и следующий вопрос,
+    если он ещё есть. Это позволяет клиенту сразу понять, что делать дальше,
+    без дополнительного запроса.
+    """
+
+    run_id = serializers.IntegerField()
+    completed = serializers.BooleanField()
+    question = QuestionPublicSerializer(required=False, allow_null=True)

@@ -6,7 +6,7 @@ from .question import (
     QuestionCreateUpdateSerializer,
     QuestionNestedSerializer,
 )
-from .run import AnswerSubmitSerializer, NextQuestionSerializer
+from .run import AnswerResultSerializer, AnswerSubmitSerializer, NextQuestionSerializer
 from .stats import SurveyStatsSerializer
 from .survey import (
     SurveyCreateUpdateSerializer,
@@ -17,6 +17,7 @@ from .survey import (
 __all__ = [
     "AnswerOptionCreateUpdateSerializer",
     "AnswerOptionNestedSerializer",
+    "AnswerResultSerializer",
     "AnswerSubmitSerializer",
     "NextQuestionSerializer",
     "QuestionCreateUpdateSerializer",
