@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 
 from django.db.models import Avg, Count, F
 
@@ -31,11 +31,7 @@ class SurveyStatsService:
     """Подготовка статистики по опросу."""
 
     @classmethod
-    def collect(cls, survey: Survey) -> dict[str, object]:
-        return asdict(cls._build(survey))
-
-    @classmethod
-    def _build(cls, survey: Survey) -> SurveyStats:
+    def collect(cls, survey: Survey) -> SurveyStats:
         total_runs = cls._count_runs(survey)
         avg_duration_seconds = cls._avg_duration_seconds(survey)
         questions = cls._questions_stats(survey)

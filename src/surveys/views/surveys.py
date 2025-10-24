@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, override
 
 from django.db.models import ProtectedError, QuerySet
 from drf_spectacular.utils import OpenApiExample, extend_schema
@@ -14,6 +14,7 @@ from src.surveys.serializers import (
     SurveyDetailSerializer,
     SurveySerializer,
 )
+from src.surveys.serializers.stats import SurveyStatsSerializer
 from src.surveys.services import SurveyStatsService
 
 
@@ -22,8 +23,13 @@ class SurveyListView(generics.ListAPIView):
     serializer_class = SurveySerializer
     permission_classes = (permissions.IsAuthenticated,)
 
+    @override
+    def get_queryset(self) -> QuerySet[Survey]:
+        return self.queryset.filter(author=self.request.user)
+
     @extend_schema(
         summary="Список опросов текущего автора",
+        description=("Возвращает все опросы, созданные текущим пользователем."),
         responses=SurveySerializer(many=True),
         examples=[
             OpenApiExample(
@@ -40,8 +46,14 @@ class SurveyListView(generics.ListAPIView):
             ),
         ],
     )
-    def get_queryset(self) -> QuerySet[Survey]:
-        return self.queryset.filter(author=self.request.user)
+    @override
+    def get(
+        self,
+        request: Request,
+        *args: object,
+        **kwargs: object,
+    ) -> Response:
+        return super().get(request, *args, **kwargs)
 
 
 class SurveyCreateView(generics.CreateAPIView):
@@ -49,23 +61,23 @@ class SurveyCreateView(generics.CreateAPIView):
     serializer_class = SurveyCreateUpdateSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
-    @extend_schema(
-        summary="Создание опроса",
-        request=SurveyCreateUpdateSerializer,
-        responses={status.HTTP_201_CREATED: SurveySerializer},
-        examples=[
-            OpenApiExample(
-                "Create survey",
-                request_only=True,
-                value={"title": "Любишь ли ты помидоры?"},
-            ),
-        ],
-    )
+    @override
     def get_serializer_context(self) -> dict[str, Any]:
         context = super().get_serializer_context()
         context["author"] = self.request.user
         return context
 
+    @extend_schema(summary="Создание опроса")
+    @override
+    def post(
+        self,
+        request: Request,
+        *args: object,
+        **kwargs: object,
+    ) -> Response:
+        return super().create(request, *args, **kwargs)
+
+    @override
     def create(
         self,
         request: Request,
@@ -143,7 +155,7 @@ class SurveyStatsView(generics.RetrieveAPIView):
 
     @extend_schema(
         summary="Статистика по опросу",
-        responses={status.HTTP_200_OK: SurveyDetailSerializer},
+        responses={status.HTTP_200_OK: SurveyStatsSerializer},
         examples=[
             OpenApiExample(
                 "Survey stats",
@@ -174,4 +186,4 @@ class SurveyStatsView(generics.RetrieveAPIView):
     ) -> Response:
         survey = self.get_object()
         stats = SurveyStatsService.collect(survey)
-        return Response(stats)
+        return Response(SurveyStatsSerializer(stats).data)
