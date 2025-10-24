@@ -9,6 +9,8 @@
 
 ## Демо-видео
 
+https://github.com/user-attachments/assets/18b1969c-8d58-49fc-b7a9-ce52b1c964cb
+
 
 ## Стек
 
@@ -88,9 +90,6 @@ make migrate   # применить миграции
 make lint
 make typecheck
 ```
-
-(Юнит-тесты будут добавлены позже.)
-
 ## OpenAPI/Swagger
 
 - `GET /api/v1/schema` — JSON схема
