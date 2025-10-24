@@ -40,10 +40,11 @@ strict = true
 plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
 
 [tool.django-stubs]
-django_settings_module = "config.settings.base"
+django_settings_module = "config.settings.dev"
 
 [dependency-groups]
 dev = [
+    "django-extensions>=4.1",
     "django-stubs>=5.2.7",
     "djangorestframework-stubs>=3.16.5",
     "mypy>=1.18.2",

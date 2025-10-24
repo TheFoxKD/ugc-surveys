@@ -30,6 +30,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
     "drf_spectacular",
+    "django_extensions",
 ]
 
 LOCAL_APPS = [
@@ -128,7 +129,6 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "UGC Surveys API",
     "DESCRIPTION": "User-generated content surveys",
     "VERSION": "1.0.0",
-    # Require auth for schema/docs
     "SERVE_AUTHENTICATION": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],

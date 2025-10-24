@@ -1,4 +1,4 @@
-.PHONY: up down migrate makemigrations shell lint typecheck test local build restart reset
+.PHONY: up down migrate makemigrations shell lint typecheck test local build restart reset show_urls
 
 
 build:
@@ -25,6 +25,9 @@ makemigrations:
 shell:
 	docker compose exec web uv run python -m src.manage shell
 
+show_urls:
+	docker compose exec web uv run python -m src.manage show_urls
+
 lint:
 	uv run ruff check .
 
@@ -32,4 +35,4 @@ format:
 	uv run ruff format .
 
 typecheck:
-	uv run mypy src
+	PYTHONPATH=src DJANGO_SETTINGS_MODULE=config.settings.dev uv run mypy src
